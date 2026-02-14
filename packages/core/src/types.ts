@@ -7,7 +7,7 @@
  */
 export type Handler<TContext extends object, TInput, TOutput> = (
   context: TContext,
-  input: TInput,
+  input: TInput
 ) => Promise<TOutput>;
 
 /**
@@ -15,7 +15,7 @@ export type Handler<TContext extends object, TInput, TOutput> = (
  * while preserving its full type signature.
  */
 export type Middleware<TContext extends object, TInput, TOutput> = (
-  next: Handler<TContext, TInput, TOutput>,
+  next: Handler<TContext, TInput, TOutput>
 ) => Handler<TContext, TInput, TOutput>;
 
 /**
