@@ -7,3 +7,6 @@ dist
 
 # Logs
 *.log
+
+# Test coverage
+coverage
