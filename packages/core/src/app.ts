@@ -1,43 +1,19 @@
-import { App, AppState, Middleware, BaseContext } from "./types";
+import type { Handler, Middleware } from "./types";
 
-export const createAppState = <C extends BaseContext>(): AppState<C> => ({
-  middleware: [],
-  routes: {},
-  services: {},
-});
-
-export const addMiddleware = <C extends BaseContext>(
-  state: AppState<C>,
-  mw: Middleware<C>,
-): AppState<C> => ({
-  ...state,
-  middleware: [...state.middleware, mw],
-});
-
-export const addRoute = <C extends BaseContext>(
-  state: AppState<C>,
-  path: string,
-  handler: Middleware<C>,
-): AppState<C> => ({
-  ...state,
-  routes: { ...state.routes, [path]: handler },
-});
-
-export const createApp = <C extends BaseContext>(): App<C> => ({
-  state: createAppState<C>(),
-});
-
-export const useMiddleware = <C extends BaseContext>(
-  app: App<C>,
-  mw: Middleware<C>,
-): App<C> => ({
-  state: addMiddleware(app.state, mw),
-});
-
-export const useRoute = <C extends BaseContext>(
-  app: App<C>,
-  path: string,
-  handler: Middleware<C>,
-): App<C> => ({
-  state: addRoute(app.state, path, handler),
-});
+/**
+ * Applies middleware to a handler in right-to-left order.
+ *
+ * Strongly typed:
+ * - Preserves exact context
+ * - Preserves exact input
+ * - Preserves exact output
+ */
+export function applyMiddleware<TContext extends object, TInput, TOutput>(
+  handler: Handler<TContext, TInput, TOutput>,
+  middlewares: readonly Middleware<TContext, TInput, TOutput>[],
+): Handler<TContext, TInput, TOutput> {
+  return middlewares.reduceRight(
+    (next, middleware) => middleware(next),
+    handler,
+  );
+}
